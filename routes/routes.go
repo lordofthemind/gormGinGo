@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lordofthemind/gormGinGo/handlers"
+	"github.com/lordofthemind/gormGinGo/initializers"
 )
 
 func Run() {
@@ -15,14 +16,20 @@ func Run() {
 	// Use middleware if needed (e.g., logging, authentication)
 	// router.Use(gin.Logger())
 
+	// Initialize repositories
+	personRepo := initializers.CreatePersonRepository()
+
+	// Initialize handlers with repositories
+	personHandler := handlers.NewPersonHandler(personRepo)
+
 	// Group routes if necessary
 	v1 := router.Group("/api/v1")
 	{
-		v1.POST("/persons", handlers.CreatePersonHandler)
-		v1.GET("/persons/:id", handlers.GetPersonHandler)
-		v1.GET("/persons", handlers.GetAllPersonsHandler)
-		v1.PUT("/persons/:id", handlers.UpdatePersonHandler)
-		v1.DELETE("/persons/:id", handlers.DeletePersonHandler)
+		v1.POST("/persons", personHandler.CreatePersonHandler)
+		v1.GET("/persons/:id", personHandler.GetPersonHandler)
+		v1.GET("/persons", personHandler.GetAllPersonsHandler)
+		v1.PUT("/persons/:id", personHandler.UpdatePersonHandler)
+		v1.DELETE("/persons/:id", personHandler.DeletePersonHandler)
 	}
 
 	// Define a port with a fallback value

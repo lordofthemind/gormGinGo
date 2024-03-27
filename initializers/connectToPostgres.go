@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/lordofthemind/gormGinGo/repositories"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,4 +20,8 @@ func ConnectToPostgresql() {
 		log.Fatal(err)
 	}
 	fmt.Println("Connected to database")
+}
+
+func CreatePersonRepository() repositories.PersonRepository {
+	return repositories.NewPersonRepository(DB)
 }

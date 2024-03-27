@@ -1,87 +1,92 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/lordofthemind/gormGinGo/initializers"
-	"github.com/lordofthemind/gormGinGo/types"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/lordofthemind/gormGinGo/repositories"
+	"github.com/lordofthemind/gormGinGo/types"
 )
 
-// CreatePersonHandler creates a new person.
-func CreatePersonHandler(ctx *gin.Context) {
-	var person types.PersonType
-
-	if err := ctx.ShouldBindJSON(&person); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "Invalid JSON payload"})
-		return
-	}
-
-	if err := person.CreatePerson(initializers.DB); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to create person"})
-		return
-	}
-
-	ctx.JSON(http.StatusCreated, person)
+// PersonControllerInterface defines the interface for person controllers.
+type PersonHandlerInterface interface {
+	CreatePersonHandler(c *gin.Context)
+	GetPersonHandler(c *gin.Context)
+	GetAllPersonsHandler(c *gin.Context)
+	UpdatePersonHandler(c *gin.Context)
+	DeletePersonHandler(c *gin.Context)
 }
 
-// GetPersonHandler retrieves a person by ID.
-func GetPersonHandler(ctx *gin.Context) {
-	var person types.PersonType
+type PersonHandler struct {
+	personRepo repositories.PersonRepository
+}
 
-	if err := person.GetPerson(initializers.DB, ctx.Param("id")); err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "message": "There is no person by this ID."})
+func NewPersonHandler(personRepo repositories.PersonRepository) *PersonHandler {
+	return &PersonHandler{personRepo: personRepo}
+}
+
+func (pc *PersonHandler) CreatePersonHandler(c *gin.Context) {
+	// Implementation omitted for brevity
+	var person types.PersonType
+	if err := c.ShouldBindJSON(&person); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "Invalid JSON payload"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, person)
+	if err := pc.personRepo.CreatePerson(&person); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to create person"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, person)
 }
 
-// GetAllPersonsHandler retrieves all persons.
-func GetAllPersonsHandler(ctx *gin.Context) {
-	persons, err := types.GetAllPersons(initializers.DB)
+func (pc *PersonHandler) GetPersonHandler(c *gin.Context) {
+	// Implementation omitted for brevity
+	id := c.Param("id")
+	person, err := pc.personRepo.GetPerson(id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to find any person"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "message": "Person not found"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, persons)
+	c.JSON(http.StatusOK, person)
 }
 
-// UpdatePersonHandler updates a person by ID.
-func UpdatePersonHandler(ctx *gin.Context) {
-	var person types.PersonType
-
-	if err := person.GetPerson(initializers.DB, ctx.Param("id")); err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+func (pc *PersonHandler) GetAllPersonsHandler(c *gin.Context) {
+	// Implementation omitted for brevity
+	persons, err := pc.personRepo.GetAllPersons()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to retrieve persons"})
 		return
 	}
 
-	if err := ctx.ShouldBindJSON(&person); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "Invalid JSON payload"})
-		return
-	}
-
-	if err := person.UpdatePerson(initializers.DB); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to update person"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, person)
+	c.JSON(http.StatusOK, persons)
 }
 
-// DeletePersonHandler deletes a person by ID.
-func DeletePersonHandler(ctx *gin.Context) {
+func (pc *PersonHandler) UpdatePersonHandler(c *gin.Context) {
+	// Implementation omitted for brevity
 	var person types.PersonType
-
-	if err := person.GetPerson(initializers.DB, ctx.Param("id")); err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error(), "message": "Person not found"})
+	if err := c.ShouldBindJSON(&person); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "Invalid JSON payload"})
 		return
 	}
 
-	if err := person.DeletePerson(initializers.DB); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to delete person"})
+	if err := pc.personRepo.UpdatePerson(&person); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to update person"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": person, "message": "Person deleted"})
+	c.JSON(http.StatusOK, person)
+}
+
+func (pc *PersonHandler) DeletePersonHandler(c *gin.Context) {
+	// Implementation omitted for brevity
+	id := c.Param("id")
+	if err := pc.personRepo.DeletePerson(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to delete person"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Person deleted"})
 }

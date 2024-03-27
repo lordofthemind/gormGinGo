@@ -15,8 +15,11 @@
 │   ├── connectToPostgres.go
 │   ├── loadEnvironmentVariables.go
 │   └── migratePostgres.go
+├── repositories
+│   └── personRepository.go
 ├── routes
 │   └── routes.go
+├── services
 ├── tests
 │   ├── main_test.go
 │   └── personHandler_test.go
@@ -24,4 +27,4 @@
 └── types
     └── personType.go
 
-7 directories, 17 files
+9 directories, 18 files
