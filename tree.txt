@@ -1,0 +1,27 @@
+.
+├── Makefile
+├── cmd
+│   └── main.go
+├── curlTest
+├── go.mod
+├── go.sum
+├── goTestGo.go
+├── handlers
+│   └── personHandler.go
+├── helpers
+│   ├── helper.go
+│   └── randomGeneratorHelper.go
+├── initializers
+│   ├── connectToPostgres.go
+│   ├── loadEnvironmentVariables.go
+│   └── migratePostgres.go
+├── routes
+│   └── routes.go
+├── tests
+│   ├── main_test.go
+│   └── personHandler_test.go
+├── tree.txt
+└── types
+    └── personType.go
+
+7 directories, 17 files

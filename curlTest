@@ -1,0 +1,93 @@
+#!/bin/bash
+
+# Base URL for the API
+BASE_URL="http://localhost:9090"
+
+# Function to send a POST request to CreatePersonHandler
+create_person() {
+    echo "Enter details to create a person:"
+    read -p "Name: " name
+    read -p "Age: " age
+    read -p "Email: " email
+    read -p "Address: " address
+
+    response=$(curl -s -X POST -H "Content-Type: application/json" -d "{\"name\":\"$name\",\"age\":$age,\"email\":\"$email\",\"address\":\"$address\"}" "$BASE_URL/api/v1/persons")
+    handle_response "$response"
+}
+
+# Function to send a GET request to GetPersonHandler
+get_person() {
+    echo "Enter the ID of the person to retrieve:"
+    read -p "ID: " id
+
+    response=$(curl -s -X GET "$BASE_URL/api/v1/persons/$id")
+    handle_response "$response"
+}
+
+# Function to send a GET request to GetAllPersonsHandler
+get_all_persons() {
+    response=$(curl -s -X GET "$BASE_URL/api/v1/persons")
+    handle_response "$response"
+}
+
+# Function to send a PUT request to UpdatePersonHandler
+update_person() {
+    echo "Enter the ID of the person to update:"
+    read -p "ID: " id
+
+    echo "Enter updated details:"
+    read -p "Name: " name
+    read -p "Age: " age
+    read -p "Email: " email
+    read -p "Address: " address
+
+    response=$(curl -s -X PUT -H "Content-Type: application/json" -d "{\"name\":\"$name\",\"age\":$age,\"email\":\"$email\",\"address\":\"$address\"}" "$BASE_URL/api/v1/persons/$id")
+    handle_response "$response"
+}
+
+# Function to send a DELETE request to DeletePersonHandler
+delete_person() {
+    echo "Enter the ID of the person to delete:"
+    read -p "ID: " id
+
+    response=$(curl -s -X DELETE "$BASE_URL/api/v1/persons/$id")
+    handle_response "$response"
+}
+
+# Function to handle API responses
+handle_response() {
+    response="$1"
+    error=$(echo "$response" | jq -r '.error')
+    message=$(echo "$response" | jq -r '.message')
+
+    if [ ! -z "$error" ]; then
+        echo "Error: $error"
+    elif [ ! -z "$message" ]; then
+        echo "Message: $message"
+    else
+        echo "Response: $response"
+    fi
+}
+
+# Main menu
+while true; do
+    echo "Choose an action:"
+    echo "1. Create Person"
+    echo "2. Get Person"
+    echo "3. Get All Persons"
+    echo "4. Update Person"
+    echo "5. Delete Person"
+    echo "6. Exit"
+
+    read -p "Enter your choice: " choice
+
+    case $choice in
+        1) create_person ;;
+        2) get_person ;;
+        3) get_all_persons ;;
+        4) update_person ;;
+        5) delete_person ;;
+        6) echo "Exiting..."; exit ;;
+        *) echo "Invalid choice. Please enter a number between 1 and 6." ;;
+    esac
+done
