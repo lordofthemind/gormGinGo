@@ -16,15 +16,18 @@
 │   ├── loadEnvironmentVariables.go
 │   └── migratePostgres.go
 ├── repositories
-│   └── personRepository.go
+│   ├── personRepository.go
+│   └── personRepository_test.go
 ├── routes
 │   └── routes.go
 ├── services
 ├── tests
+│   ├── connectToPostgre_test.go
+│   ├── loadEnvironmentVariables_test.go
 │   ├── main_test.go
-│   └── personHandler_test.go
+│   └── migratePostgres_test.go
 ├── tree.txt
 └── types
     └── personType.go
 
-9 directories, 18 files
+9 directories, 21 files

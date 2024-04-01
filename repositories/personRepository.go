@@ -5,30 +5,24 @@ import (
 	"gorm.io/gorm"
 )
 
-// PersonRepository defines the interface for database operations related to persons.
-type PersonRepository interface {
-	CreatePerson(person *types.PersonType) error
-	GetPerson(id string) (*types.PersonType, error)
-	GetAllPersons() ([]types.PersonType, error)
-	UpdatePerson(person *types.PersonType) error
-	DeletePerson(id string) error
-}
-
-// PersonRepositoryImpl implements PersonRepository.
-type PersonRepositoryImpl struct {
+type PersonRepository struct {
 	db *gorm.DB
 }
 
-// NewPersonRepository creates a new instance of PersonRepositoryImpl.
-func NewPersonRepository(db *gorm.DB) *PersonRepositoryImpl {
-	return &PersonRepositoryImpl{db: db}
+func NewPersonRepository(db *gorm.DB) *PersonRepository {
+	return &PersonRepository{db: db}
 }
 
-func (r *PersonRepositoryImpl) CreatePerson(person *types.PersonType) error {
-	return r.db.Create(person).Error
+// CreatePerson creates a new person record in the database.
+func (r *PersonRepository) CreatePerson(person *types.PersonType) (*types.PersonType, error) {
+	if err := r.db.Create(person).Error; err != nil {
+		return nil, err
+	}
+	return person, nil
 }
 
-func (r *PersonRepositoryImpl) GetPerson(id string) (*types.PersonType, error) {
+// GetPerson retrieves a person record from the database based on the given ID.
+func (r *PersonRepository) GetPerson(id string) (*types.PersonType, error) {
 	var person types.PersonType
 	if err := r.db.First(&person, id).Error; err != nil {
 		return nil, err
@@ -36,7 +30,8 @@ func (r *PersonRepositoryImpl) GetPerson(id string) (*types.PersonType, error) {
 	return &person, nil
 }
 
-func (r *PersonRepositoryImpl) GetAllPersons() ([]types.PersonType, error) {
+// GetAllPersons retrieves all person records from the database.
+func (r *PersonRepository) GetAllPersons() ([]types.PersonType, error) {
 	var persons []types.PersonType
 	if err := r.db.Find(&persons).Error; err != nil {
 		return nil, err
@@ -44,10 +39,12 @@ func (r *PersonRepositoryImpl) GetAllPersons() ([]types.PersonType, error) {
 	return persons, nil
 }
 
-func (r *PersonRepositoryImpl) UpdatePerson(person *types.PersonType) error {
+// UpdatePerson updates the details of an existing person record in the database.
+func (r *PersonRepository) UpdatePerson(person *types.PersonType) error {
 	return r.db.Save(person).Error
 }
 
-func (r *PersonRepositoryImpl) DeletePerson(id string) error {
+// DeletePerson deletes a person record from the database based on the given ID.
+func (r *PersonRepository) DeletePerson(id string) error {
 	return r.db.Delete(&types.PersonType{}, id).Error
 }

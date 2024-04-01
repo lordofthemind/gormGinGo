@@ -13,5 +13,5 @@ func init() {
 }
 
 func main() {
-	routes.Run()
+	routes.Run(initializers.DB)
 }

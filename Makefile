@@ -16,4 +16,7 @@ postgres-connect:
 run:
 	go run ./cmd/main.go
 
-.PHONY : postgres postgres-stop postgres-remove postgres-logs postgres-connect run
+test:
+	go test -v ./...
+
+.PHONY : postgres postgres-stop postgres-remove postgres-logs postgres-connect run test

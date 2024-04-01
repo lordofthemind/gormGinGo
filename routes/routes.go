@@ -6,32 +6,30 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lordofthemind/gormGinGo/handlers"
-	"github.com/lordofthemind/gormGinGo/initializers"
+	"gorm.io/gorm"
 )
 
-func Run() {
+func Run(db *gorm.DB) {
 	// Initialize Gin router
 	router := gin.Default()
 
-	// Use middleware if needed (e.g., logging, authentication)
-	// router.Use(gin.Logger())
+	personHandler := handlers.NewPersonHandler(db)
 
-	// Initialize repositories
-	personRepo := initializers.CreatePersonRepository()
-
-	// Initialize handlers with repositories
-	personHandler := handlers.NewPersonHandler(personRepo)
-
-	// Group routes if necessary
+	// Routes
 	v1 := router.Group("/api/v1")
 	{
-		v1.POST("/persons", personHandler.CreatePersonHandler)
-		v1.GET("/persons/:id", personHandler.GetPersonHandler)
-		v1.GET("/persons", personHandler.GetAllPersonsHandler)
-		v1.PUT("/persons/:id", personHandler.UpdatePersonHandler)
-		v1.DELETE("/persons/:id", personHandler.DeletePersonHandler)
+		// Person routes
+		persons := v1.Group("/persons")
+		{
+			persons.POST("/", personHandler.CreatePersonHandler)
+			persons.GET("/:id", personHandler.GetPersonHandler)
+			persons.GET("/", personHandler.GetAllPersonsHandler)
+			persons.PUT("/:id", personHandler.UpdatePersonHandler)
+			persons.DELETE("/:id", personHandler.DeletePersonHandler)
+		}
 	}
 
+	// Start server
 	// Define a port with a fallback value
 	port := os.Getenv("PORT")
 	if port == "" {
