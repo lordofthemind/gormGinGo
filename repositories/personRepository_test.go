@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lordofthemind/gormGinGo/tests"
 	"github.com/lordofthemind/gormGinGo/types"
 )
 
